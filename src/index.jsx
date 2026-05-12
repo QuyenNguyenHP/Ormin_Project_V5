@@ -12,7 +12,11 @@ import {
 
 import "./global.css";
 
-const muiTheme = createTheme();
+const muiTheme = createTheme({
+  typography: {
+    fontFamily: '"Roboto", sans-serif',
+  },
+});
 
 const container = document.getElementById("root");
 

@@ -14,7 +14,7 @@ const Overview = () => {
             <Typography
               variant="h2"
               component="h1"
-              className="!m-0 text-[32px] font-[Inter] font-bold text-[#f8fafc]"
+              className="!m-0 text-[32px] font-[Roboto] font-bold text-[#f8fafc]"
             >
               Overview
             </Typography>

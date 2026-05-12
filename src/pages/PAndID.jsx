@@ -12,6 +12,8 @@ import { fetchPIDMonitorPayload } from "../services/pidMonitorApi";
 const PAndID = () => {
   const svgObjectRef = useRef(null);
   const [monitorData, setMonitorData] = useState(null);
+  const [modbusConnected, setModbusConnected] = useState(null);
+  const svgResetKey = modbusConnected === false ? "monitor-base" : "monitor-live";
 
   useEffect(() => {
     let isMounted = true;
@@ -21,8 +23,12 @@ const PAndID = () => {
         const payload = await fetchPIDMonitorPayload();
         if (!isMounted) return;
         setMonitorData(buildPIDMonitorDataFromModbus(payload));
+        setModbusConnected(true);
       } catch (error) {
         console.error("Failed to load PID monitor data:", error);
+        if (!isMounted) return;
+        setMonitorData(null);
+        setModbusConnected(false);
       }
     };
 
@@ -43,24 +49,28 @@ const PAndID = () => {
 
   const handleSvgLoad = () => {
     const svgDocument = svgObjectRef.current?.contentDocument;
+
+    if (modbusConnected === false) return;
+
     updatePIDMonitorElements(svgDocument, monitorData);
   };
 
   return (
     <Box className="h-[1080px] relative bg-[#101828] w-full overflow-hidden shrink-0 flex flex-col items-start leading-[normal] tracking-[normal] mq925:h-auto">
-      <Header />
+      <Header modbusConnected={modbusConnected} />
       <main className="self-stretch h-[955px] overflow-hidden shrink-0 flex items-start [row-gap:20px] max-w-full mq1825:flex-wrap">
         <NavigationSidebar />
         <section className="h-[948px] w-[1696px] overflow-hidden shrink-0 flex items-start !p-4 box-border gap-4 max-w-full text-center text-xs text-[#ff0909] font-[Roboto] mq925:h-auto">
           <Box className="h-[916px] flex-1 rounded-[10px] bg-[#1e2939] border-[#364153] border-solid border-[1px] box-border overflow-hidden flex flex-col items-start !pt-[15px] !pb-0 !pl-4 !pr-4 max-w-full shrink-0 mq925:h-auto">
             <Box className="relative self-stretch flex-1 w-full overflow-hidden rounded-[10px] bg-[#111827]">
-              <Box className="absolute inset-[10px] overflow-hidden rounded-[10px] border border-[#364153] bg-[#0f172a]">
+              <Box className="absolute inset-0 overflow-hidden rounded-[4px] border border-[#364153] bg-[#0f172a]">
                 <img
                   className="absolute inset-0 h-full w-full object-contain"
                   alt="P&ID background"
                   src="/P&IDbackground.png"
                 />
                 <object
+                  key={svgResetKey}
                   ref={svgObjectRef}
                   aria-label="Monitor items overlay"
                   className="absolute inset-0 h-full w-full"

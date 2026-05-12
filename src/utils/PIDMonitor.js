@@ -99,9 +99,9 @@ export const DIGITAL_MAPPINGS = [
 ];
 
 const DIGITAL_ON_COLOR = "#05DF72";
-const DIGITAL_OFF_COLOR = "#FF4D4F";
+const DIGITAL_OFF_COLOR = "#99A1AF";
 const DIGITAL_ON_FILL = "rgba(5, 223, 114, 0.32)";
-const DIGITAL_OFF_FILL = "rgba(255, 77, 79, 0.18)";
+const DIGITAL_OFF_FILL = "rgba(255, 77, 80, 0)";
 
 export const formatFlowValue = (value, unit = "L/H") =>
   `${Math.round(value)} ${unit}`;

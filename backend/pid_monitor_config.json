@@ -1,8 +1,8 @@
 {
   "modbus": {
-    "host": "127.0.0.1",
+    "host": "192.168.18.26",
     "port": 502,
-    "unit_id": 1,
+    "unit_id": 16,
     "timeout_seconds": 3,
     "poll_interval_ms": 2000
   },

@@ -54,24 +54,24 @@
 <path d="M575.594 307.323H621.862V327.698H575.594V307.323Z" stroke="#99A1AF" stroke-width="4" mask="url(#path-33-inside-4_65_2)"/>
 </g>
 <rect id="LL_H.O.service.tank" x="631.776" y="283.703" width="11.5833" height="11.5833" stroke="#99A1AF" stroke-width="2"/>
-<text id="Flow18" x="1504.42" y="679.891" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow17" x="1504.42" y="628.953" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow16" x="1504.42" y="487.177" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow15" x="1502.72" y="435.391" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow14" x="1505.27" y="293.615" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow13" x="1504.42" y="242.677" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow12" x="1502.72" y="99.2031" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow11" x="1501.87" y="48.2656" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow10" x="1155.5" y="733.375" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow9" x="1155.5" y="679.891" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow8" x="1158.04" y="539.812" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow7" x="1158.04" y="484.63" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow6" x="1157.2" y="347.099" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow5" x="1157.2" y="290.219" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow4" x="1158.04" y="148.443" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow3" x="1158.04" y="92.4115" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow2" x="329.462" y="450.672" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
-<text id="Flow1" x="329.462" y="162.026" fill="#155dfc" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow18" x="1504.42" y="679.891" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow17" x="1504.42" y="628.953" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow16" x="1504.42" y="487.177" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow15" x="1502.72" y="435.391" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow14" x="1505.27" y="293.615" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow13" x="1504.42" y="242.677" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow12" x="1502.72" y="99.2031" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow11" x="1501.87" y="48.2656" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow10" x="1155.5" y="733.375" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow9" x="1155.5" y="679.891" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow8" x="1158.04" y="539.812" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow7" x="1158.04" y="484.63" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow6" x="1157.2" y="347.099" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow5" x="1157.2" y="290.219" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow4" x="1158.04" y="148.443" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow3" x="1158.04" y="92.4115" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow2" x="329.462" y="450.672" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
+<text id="Flow1" x="329.462" y="162.026" fill="#fdfdfd00" font-family="Consolas, monospace" font-size="12" font-weight="700" dominant-baseline="hanging">100 L/H</text>
 </g>
 </svg>
 

@@ -10,7 +10,7 @@ const NavigationSidebar = ({ className = "" }) => {
 
   return (
     <section
-      className={`h-[916px] w-[222px] overflow-hidden rounded-[10px] shadow-[0px_10px_15px_-3px_rgba(0,_0,_0,_0.1),_0px_4px_6px_-4px_rgba(0,_0,_0,_0.1)] bg-[#1e2939] border-[#364153] border-solid border-[1px] box-border flex flex-col items-start text-left text-xs text-[#99a1af] font-[Inter] shrink-0 !mt-4 !ml-4 mq925:h-auto ${className}`}
+      className={`h-[916px] w-[222px] overflow-hidden rounded-[10px] shadow-[0px_10px_15px_-3px_rgba(0,_0,_0,_0.1),_0px_4px_6px_-4px_rgba(0,_0,_0,_0.1)] bg-[#1e2939] border-[#364153] border-solid border-[1px] box-border flex flex-col items-start text-left text-xs text-[#99a1af] font-[Roboto] shrink-0 !mt-4 !ml-4 mq925:h-auto ${className}`}
     >
       <Box className="w-[222px] h-[49px] border-[#364153] border-solid border-b-[1px] box-border flex flex-col items-start !pt-4 !pb-px !pl-4 !pr-4">
         <Box className="self-stretch h-4 flex items-start">

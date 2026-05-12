@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const Footer = ({ className = "" }) => {
   return (
     <footer
-      className={`self-stretch bg-[#1e2939] border-[#364153] border-solid border-t-[1px] flex items-center justify-between !pt-2 !pb-2 !pl-6 !pr-6 gap-5 text-left text-xs text-[#6a7282] font-[Inter] mq925:h-auto mq925:flex-wrap mq925:gap-5 ${className}`}
+      className={`self-stretch bg-[#1e2939] border-[#364153] border-solid border-t-[1px] flex items-center justify-between !pt-2 !pb-2 !pl-6 !pr-6 gap-5 text-left text-xs text-[#6a7282] font-[Roboto] mq925:h-auto mq925:flex-wrap mq925:gap-5 ${className}`}
     >
       <Box className="h-4 w-[239.7px] flex items-center gap-4">
         <Box className="h-4 flex-1 flex items-start">
