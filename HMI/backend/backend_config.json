@@ -1,0 +1,95 @@
+{
+  "modbus": {
+    "host": "10.0.0.205",
+    "port": 502,
+    "unit_id": 16,
+    "timeout_seconds": 3,
+    "poll_interval_ms": 2000
+  },
+  "pages": {
+    "overview": {
+      "gauges": [
+        { "key": "engine_1_load", "title": "Engine 1", "subtitle": "Main propulsion load", "source_type": "holding_register", "address": 40001, "scale": 1, "unit": "%", "color": "#22c55e" },
+        { "key": "engine_2_load", "title": "Engine 2", "subtitle": "Auxiliary engine load", "source_type": "holding_register", "address": 40002, "scale": 1, "unit": "%", "color": "#f59e0b" },
+        { "key": "engine_3_load", "title": "Engine 3", "subtitle": "Generator engine load", "source_type": "holding_register", "address": 40003, "scale": 1, "unit": "%", "color": "#38bdf8" }
+      ]
+    },
+    "engine": {
+      "bar_chart": [
+        { "key": "cyl_1_load", "name": "Cyl 1", "source_type": "holding_register", "address": 40004, "scale": 1, "unit": "%" },
+        { "key": "cyl_2_load", "name": "Cyl 2", "source_type": "holding_register", "address": 40005, "scale": 1, "unit": "%" },
+        { "key": "cyl_3_load", "name": "Cyl 3", "source_type": "holding_register", "address": 40006, "scale": 1, "unit": "%" },
+        { "key": "cyl_4_load", "name": "Cyl 4", "source_type": "holding_register", "address": 40007, "scale": 1, "unit": "%" },
+        { "key": "cyl_5_load", "name": "Cyl 5", "source_type": "holding_register", "address": 40008, "scale": 1, "unit": "%" },
+        { "key": "cyl_6_load", "name": "Cyl 6", "source_type": "holding_register", "address": 40009, "scale": 1, "unit": "%" }
+      ],
+      "summary": [
+        { "key": "rpm", "label": "RPM", "source_type": "holding_register", "address": 40010, "scale": 1, "unit": "rpm" },
+        { "key": "coolant_temp", "label": "Coolant Temp", "source_type": "holding_register", "address": 40011, "scale": 1, "unit": "C" },
+        { "key": "oil_pressure", "label": "Oil Pressure", "source_type": "holding_register", "address": 40012, "scale": 0.1, "unit": "bar" },
+        { "key": "fuel_rate", "label": "Fuel Rate", "source_type": "holding_register", "address": 40013, "scale": 1, "unit": "L/h" }
+      ],
+      "status": [
+        { "key": "engine_running", "label": "Engine Running", "source_type": "discrete_input", "address": 10001 }
+      ]
+    },
+    "pid": {
+      "flows": [
+        { "key": "flow_1", "name": "Flow 1", "source_type": "holding_register", "address": 40001, "scale": 1, "unit": "L/H" },
+        { "key": "flow_2", "name": "Flow 2", "source_type": "holding_register", "address": 40002, "scale": 1, "unit": "L/H" },
+        { "key": "flow_3", "name": "Flow 3", "source_type": "holding_register", "address": 40003, "scale": 1, "unit": "L/H" },
+        { "key": "flow_4", "name": "Flow 4", "source_type": "holding_register", "address": 40004, "scale": 1, "unit": "L/H" },
+        { "key": "flow_5", "name": "Flow 5", "source_type": "holding_register", "address": 40005, "scale": 1, "unit": "L/H" },
+        { "key": "flow_6", "name": "Flow 6", "source_type": "holding_register", "address": 40006, "scale": 1, "unit": "L/H" },
+        { "key": "flow_7", "name": "Flow 7", "source_type": "holding_register", "address": 40007, "scale": 1, "unit": "L/H" },
+        { "key": "flow_8", "name": "Flow 8", "source_type": "holding_register", "address": 40008, "scale": 1, "unit": "L/H" },
+        { "key": "flow_9", "name": "Flow 9", "source_type": "holding_register", "address": 40009, "scale": 1, "unit": "L/H" },
+        { "key": "flow_10", "name": "Flow 10", "source_type": "holding_register", "address": 40010, "scale": 1, "unit": "L/H" },
+        { "key": "flow_11", "name": "Flow 11", "source_type": "holding_register", "address": 40011, "scale": 1, "unit": "L/H" },
+        { "key": "flow_12", "name": "Flow 12", "source_type": "holding_register", "address": 40012, "scale": 1, "unit": "L/H" },
+        { "key": "flow_13", "name": "Flow 13", "source_type": "holding_register", "address": 40013, "scale": 1, "unit": "L/H" },
+        { "key": "flow_14", "name": "Flow 14", "source_type": "holding_register", "address": 40014, "scale": 1, "unit": "L/H" },
+        { "key": "flow_15", "name": "Flow 15", "source_type": "holding_register", "address": 40015, "scale": 1, "unit": "L/H" },
+        { "key": "flow_16", "name": "Flow 16", "source_type": "holding_register", "address": 40016, "scale": 1, "unit": "L/H" },
+        { "key": "flow_17", "name": "Flow 17", "source_type": "holding_register", "address": 40017, "scale": 1, "unit": "L/H" },
+        { "key": "flow_18", "name": "Flow 18", "source_type": "holding_register", "address": 40018, "scale": 1, "unit": "L/H" }
+      ],
+      "digitals": [
+        { "key": "pump_1", "label": "Pump 1", "source_type": "discrete_input", "address": 10001 },
+        { "key": "pump_2", "label": "Pump 2", "source_type": "discrete_input", "address": 10002 },
+        { "key": "pump_3", "label": "Pump 3", "source_type": "discrete_input", "address": 10003 },
+        { "key": "pump_4", "label": "Pump 4", "source_type": "discrete_input", "address": 10004 },
+        { "key": "pump_5", "label": "Pump 5", "source_type": "discrete_input", "address": 10005 },
+        { "key": "pump_6", "label": "Pump 6", "source_type": "discrete_input", "address": 10006 },
+        { "key": "pump_7", "label": "Pump 7", "source_type": "discrete_input", "address": 10007 },
+        { "key": "pump_8", "label": "Pump 8", "source_type": "discrete_input", "address": 10008 },
+        { "key": "pump_9", "label": "Pump 9", "source_type": "discrete_input", "address": 10009 },
+        { "key": "pump_10", "label": "Pump 10", "source_type": "discrete_input", "address": 10010 },
+        { "key": "pump_11", "label": "Pump 11", "source_type": "discrete_input", "address": 10011 },
+        { "key": "pump_12", "label": "Pump 12", "source_type": "discrete_input", "address": 10012 },
+        { "key": "lc_do_service_tank", "label": "LC_D.O.service.tank", "source_type": "discrete_input", "address": 10013 },
+        { "key": "lc_ho_settling_tank", "label": "LC_H.O.settling.tank", "source_type": "discrete_input", "address": 10014 },
+        { "key": "lh_do_service_tank", "label": "LH_D.O.service.tank", "source_type": "discrete_input", "address": 10015 },
+        { "key": "lh_fo_drain_tank", "label": "LH_F.O. drain tank", "source_type": "discrete_input", "address": 10016 },
+        { "key": "lh_ho_settling_tank", "label": "LH_H.O.settling.tank", "source_type": "discrete_input", "address": 10017 },
+        { "key": "ll_do_service_tank", "label": "LL_D.O.service.tank", "source_type": "discrete_input", "address": 10018 },
+        { "key": "ll_fo_drain_tank", "label": "LL_F.O. drain tank", "source_type": "discrete_input", "address": 10019 },
+        { "key": "ll_ho_service_tank", "label": "LL_H.O.service.tank", "source_type": "discrete_input", "address": 10020 },
+        { "key": "ll_ho_settling_tank", "label": "LL_H.O.settling.tank", "source_type": "discrete_input", "address": 10021 },
+        { "key": "ls_sludge_tank", "label": "LS_Sludge.tank", "source_type": "discrete_input", "address": 10022 },
+        { "key": "ts_do_service_tank", "label": "TS_D.O.service.tank", "source_type": "discrete_input", "address": 10023 },
+        { "key": "ts_fo_drain_tank", "label": "TS_F.O. drain tank", "source_type": "discrete_input", "address": 10024 },
+        { "key": "ts_ho_purifier_no1", "label": "TS_H.O.purifier.No1", "source_type": "discrete_input", "address": 10025 },
+        { "key": "ts_ho_purifier_no2", "label": "TS_H.O.purifier.No2", "source_type": "discrete_input", "address": 10026 },
+        { "key": "ts_ho_purifier_no3", "label": "TS_H.O.purifier.No3", "source_type": "discrete_input", "address": 10027 },
+        { "key": "ts_ho_settling_tank", "label": "TS_H.O.settling.tank", "source_type": "discrete_input", "address": 10028 },
+        { "key": "ts1_ho_service_tank", "label": "TS1_H.O.service.tank", "source_type": "discrete_input", "address": 10029 },
+        { "key": "ts2_ho_service_tank", "label": "TS2_H.O.service.tank", "source_type": "discrete_input", "address": 10030 },
+        { "key": "tsh_do_service_tank", "label": "TSH_D.O.service.tank", "source_type": "discrete_input", "address": 10031 },
+        { "key": "tsh_fo_drain_tank", "label": "TSH_F.O. drain tank", "source_type": "discrete_input", "address": 10032 },
+        { "key": "tsh_ho_service_tank", "label": "TSH_H.O.service.tank", "source_type": "discrete_input", "address": 10033 },
+        { "key": "tsh_ho_settling_tank", "label": "TSH_H.O.settling.tank", "source_type": "discrete_input", "address": 10034 }
+      ]
+    }
+  }
+}

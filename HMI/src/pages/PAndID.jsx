@@ -4,43 +4,29 @@ import Header from "../components/Header";
 import NavigationSidebar from "../components/NavigationSidebar";
 import Footer from "../components/Footer";
 import {
-  buildPIDMonitorDataFromModbus,
+  buildPIDMonitorDataFromPagePayload,
   updatePIDMonitorElements,
 } from "../utils/PIDMonitor";
-import { fetchPIDMonitorPayload } from "../services/pidMonitorApi";
+import { usePolledPagePayload } from "../hooks/usePolledPagePayload";
 
 const PAndID = () => {
   const svgObjectRef = useRef(null);
+  const { payload, error, lastUpdated, pollIntervalMs } = usePolledPagePayload("pid");
   const [monitorData, setMonitorData] = useState(null);
-  const [modbusConnected, setModbusConnected] = useState(null);
+  const modbusConnected = error ? false : payload ? true : null;
   const svgResetKey = modbusConnected === false ? "monitor-base" : "monitor-live";
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadPIDMonitor = async () => {
-      try {
-        const payload = await fetchPIDMonitorPayload();
-        if (!isMounted) return;
-        setMonitorData(buildPIDMonitorDataFromModbus(payload));
-        setModbusConnected(true);
-      } catch (error) {
+    if (!payload) {
+      if (error) {
         console.error("Failed to load PID monitor data:", error);
-        if (!isMounted) return;
         setMonitorData(null);
-        setModbusConnected(false);
       }
-    };
+      return;
+    }
 
-    loadPIDMonitor();
-
-    const intervalId = window.setInterval(loadPIDMonitor, 2000);
-
-    return () => {
-      isMounted = false;
-      window.clearInterval(intervalId);
-    };
-  }, []);
+    setMonitorData(buildPIDMonitorDataFromPagePayload(payload));
+  }, [error, payload]);
 
   useEffect(() => {
     const svgDocument = svgObjectRef.current?.contentDocument;
@@ -89,7 +75,17 @@ const PAndID = () => {
           </Box>
         </section>
       </main>
-      <Footer />
+      <Footer
+        lastUpdated={lastUpdated}
+        networkStatus={
+          modbusConnected === false
+            ? "Disconnected"
+            : modbusConnected
+              ? "Connected"
+              : "Connecting..."
+        }
+        pollIntervalMs={pollIntervalMs}
+      />
     </Box>
   );
 };

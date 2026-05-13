@@ -190,6 +190,48 @@ export const buildPIDMonitorDataFromModbus = ({
   digitalData: buildDigitalDataFromAddressMap(discreteInputs),
 });
 
+export const buildPIDMonitorDataFromPagePayload = (payload = {}) => {
+  const flows = payload.sections?.flows ?? [];
+  const digitals = payload.sections?.digitals ?? [];
+
+  const flowData = flows.reduce((accumulator, flowItem, index) => {
+    const flowId = FLOW_IDS[index];
+    if (!flowId) {
+      return accumulator;
+    }
+
+    const numericValue = Number(flowItem.value ?? 0);
+
+    accumulator[flowId] = {
+      value: numericValue,
+      label: formatFlowValue(numericValue, flowItem.unit),
+      color: getFlowColor(numericValue),
+    };
+
+    return accumulator;
+  }, {});
+
+  const digitalData = digitals.reduce((accumulator, digitalItem) => {
+    const digitalId = digitalItem.label;
+    const isOn = Boolean(digitalItem.value);
+
+    if (!digitalId) {
+      return accumulator;
+    }
+
+    accumulator[digitalId] = {
+      value: isOn,
+      label: isOn ? "ON" : "OFF",
+      color: isOn ? DIGITAL_ON_COLOR : DIGITAL_OFF_COLOR,
+      fill: isOn ? DIGITAL_ON_FILL : DIGITAL_OFF_FILL,
+    };
+
+    return accumulator;
+  }, {});
+
+  return { flowData, digitalData };
+};
+
 const setElementStateAttributes = (element, digitalValue) => {
   element.setAttribute("data-state", digitalValue.label);
   element.setAttribute("data-raw-value", digitalValue.value ? "1" : "0");

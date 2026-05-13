@@ -1,7 +1,53 @@
 import { Box } from "@mui/material";
 import PropTypes from "prop-types";
 
-const Footer = ({ className = "" }) => {
+const formatLastUpdated = (lastUpdated) => {
+  if (!lastUpdated) {
+    return "Waiting for data...";
+  }
+
+  const timestamp =
+    lastUpdated instanceof Date ? lastUpdated : new Date(lastUpdated);
+
+  if (Number.isNaN(timestamp.getTime())) {
+    return "Waiting for data...";
+  }
+
+  return timestamp.toLocaleTimeString();
+};
+
+const formatPollInterval = (pollIntervalMs) => {
+  if (!pollIntervalMs || pollIntervalMs <= 0) {
+    return "";
+  }
+
+  const seconds = pollIntervalMs / 1000;
+  const formattedSeconds = Number.isInteger(seconds) ? seconds : seconds.toFixed(1);
+
+  return `every ${formattedSeconds}s`;
+};
+
+const getNetworkStatusClassName = (networkStatus) => {
+  if (networkStatus === "Connected") {
+    return "text-[#05DF72]";
+  }
+
+  if (networkStatus === "Disconnected") {
+    return "text-[#f87171]";
+  }
+
+  return "text-[#f59e0b]";
+};
+
+const Footer = ({
+  className = "",
+  lastUpdated = null,
+  networkStatus = "Connected",
+  pollIntervalMs = null,
+}) => {
+  const pollIntervalLabel = formatPollInterval(pollIntervalMs);
+  const networkStatusClassName = getNetworkStatusClassName(networkStatus);
+
   return (
     <footer
       className={`self-stretch bg-[#1e2939] border-[#364153] border-solid border-t-[1px] flex items-center justify-between !pt-2 !pb-2 !pl-6 !pr-6 gap-5 text-left text-xs text-[#6a7282] font-[Roboto] mq925:h-auto mq925:flex-wrap mq925:gap-5 ${className}`}
@@ -26,15 +72,18 @@ const Footer = ({ className = "" }) => {
           <img className="h-3 w-3 relative" alt="" src="/Icon.svg" />
           <Box className="h-4 flex-1 flex items-start">
             <div className="relative leading-4 whitespace-nowrap shrink-0">
-              Last Update: 7:59:12 PM
+              Last Update: {formatLastUpdated(lastUpdated)}
+              {pollIntervalLabel ? ` • ${pollIntervalLabel}` : ""}
             </div>
           </Box>
         </Box>
         <Box className="h-4 w-[128.3px] flex items-center gap-2">
           <img className="h-3 w-3 relative" alt="" src="/Icon.svg" />
           <Box className="h-4 flex-1 flex items-start">
-            <div className="relative leading-4 whitespace-nowrap shrink-0">
-              Network: Connected
+            <div
+              className={`relative leading-4 whitespace-nowrap shrink-0 ${networkStatusClassName}`}
+            >
+              Network: {networkStatus}
             </div>
           </Box>
         </Box>
@@ -45,6 +94,12 @@ const Footer = ({ className = "" }) => {
 
 Footer.propTypes = {
   className: PropTypes.string,
+  lastUpdated: PropTypes.oneOfType([
+    PropTypes.instanceOf(Date),
+    PropTypes.string,
+  ]),
+  networkStatus: PropTypes.string,
+  pollIntervalMs: PropTypes.number,
 };
 
 export default Footer;

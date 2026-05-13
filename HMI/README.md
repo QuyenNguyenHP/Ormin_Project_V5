@@ -1,38 +1,62 @@
-# 🚢 P&ID Monitor Dashboard
+# 🚢 HMI Monitor Dashboard
 
-Giao diện giám sát P&ID được xây dựng bằng **React + Vite** ở frontend và **Flask + pymodbus** ở backend để đọc dữ liệu **Modbus TCP** thật từ thiết bị/PLC.
+HMI này dùng:
 
-Frontend hiển thị:
+- ⚛️ React + Vite cho frontend
+- 🐍 Flask + `pymodbus` cho backend
+- 🔌 Modbus TCP để đọc dữ liệu thật từ PLC / thiết bị
 
-- 🔢 `Flow1 ... Flow18` theo dạng giá trị analog như `100 L/H`
-- 🟢🔴 các tín hiệu digital như `pump 1`, `TSH_F.O. drain tank`, `LL_D.O.service.tank` theo trạng thái `ON/OFF`
-- 🖼️ sơ đồ `P&IDbackground.png` + lớp phủ `Monitor items.svg`
+Kiến trúc hiện tại đã thống nhất theo kiểu **page-based API**:
 
-## ✨ Kiến trúc dự án
+- `Overview.jsx` gọi `/api/overview`
+- `Engine.jsx` gọi `/api/engine`
+- `PAndID.jsx` gọi `/api/pid`
+- `/api/debug/modbus-snapshot` chỉ dùng để debug raw Modbus khi cần
+
+---
+
+## ✨ Kiến trúc tổng thể
 
 ```text
-Frontend (React/Vite)
-  -> gọi /api/pid-monitor
-Backend (Flask)
-  -> đọc Modbus TCP bằng pymodbus
-Thiết bị Modbus / PLC
+Frontend page
+  -> gọi /api/<page_name>
+Backend Flask
+  -> đọc config theo page trong backend_config.json
+  -> gom các địa chỉ Modbus cần dùng
+  -> đọc Modbus theo nhóm địa chỉ liên tiếp
+  -> map dữ liệu thành JSON phù hợp cho page
+PLC / Modbus TCP device
 ```
+
+Ví dụ:
+
+- `/api/overview` trả dữ liệu gauge cho trang Overview
+- `/api/engine` trả dữ liệu bar chart + summary cho trang Engine
+- `/api/pid` trả dữ liệu flow + digital cho trang P&ID
+- `/api/debug/modbus-snapshot` trả dữ liệu thô để kiểm tra nhanh
+
+---
 
 ## 📁 Cấu trúc thư mục chính
 
 ```text
 backend/
   app.py
-  pid_monitor_config.json
+  backend_config.json
   requirements.txt
 
 public/
   Monitor items.svg
+  Monitor items 1.svg
   P&IDbackground.png
 
 src/
   components/
+    EngineBarChart.jsx
+    EngineGauge.jsx
   pages/
+    Overview.jsx
+    Engine.jsx
     PAndID.jsx
   services/
     pidMonitorApi.js
@@ -40,30 +64,177 @@ src/
     PIDMonitor.js
 ```
 
-## 🧰 Công nghệ sử dụng
+---
 
-- ⚛️ React 19
-- ⚡ Vite
-- 🎨 MUI + Tailwind utility classes
-- 🐍 Flask
-- 🔌 pymodbus
+## ⚙️ Cấu hình backend
 
-## ✅ Yêu cầu môi trường
+File cấu hình chính:
 
-Trước khi chạy dự án, hãy đảm bảo bạn đã cài:
+[`backend/backend_config.json`](./backend/backend_config.json)
 
-- `Node.js` 20+
-- `Python` 3.10+ hoặc mới hơn
-- quyền truy cập tới thiết bị Modbus TCP
+Cấu trúc hiện tại:
 
-Kiểm tra nhanh:
-
-```bash
-node -v
-python --version
+```json
+{
+  "modbus": {
+    "host": "10.0.0.205",
+    "port": 502,
+    "unit_id": 16,
+    "timeout_seconds": 3,
+    "poll_interval_ms": 2000
+  },
+  "pages": {
+    "overview": {
+      "gauges": []
+    },
+    "engine": {
+      "bar_chart": [],
+      "summary": [],
+      "status": []
+    },
+    "pid": {
+      "flows": [],
+      "digitals": []
+    }
+  }
+}
 ```
 
-## 🚀 Chạy dự án ở môi trường local
+### 🔎 Ý nghĩa
+
+#### `modbus`
+
+- `host`: IP của PLC / thiết bị Modbus TCP
+- `port`: thường là `502`
+- `unit_id`: slave id / unit id
+- `timeout_seconds`: timeout mỗi lần đọc
+- `poll_interval_ms`: chu kỳ polling frontend có thể tham khảo
+
+#### `pages`
+
+Mỗi page có các section riêng.
+
+Ví dụ:
+
+- `overview.gauges` cho gauge
+- `engine.bar_chart` cho biểu đồ cột
+- `engine.summary` cho các giá trị text
+- `engine.status` cho trạng thái số
+- `pid.flows` và `pid.digitals` cho trang P&ID
+
+---
+
+## 🔌 Quy ước địa chỉ Modbus
+
+Trong config, bạn nhập địa chỉ theo kiểu tài liệu PLC quen dùng:
+
+- `40001` cho holding register
+- `10001` cho discrete input
+
+Backend sẽ tự đổi về offset `0-based` cho `pymodbus`.
+
+Ví dụ:
+
+- `40001` -> offset `0`
+- `40002` -> offset `1`
+- `10001` -> offset `0`
+
+---
+
+## 🐍 Backend hoạt động như thế nào
+
+File chính:
+
+[`backend/app.py`](./backend/app.py)
+
+Luồng chính:
+
+1. 📥 load config từ `backend_config.json`
+2. 📄 lấy config của page đang được gọi
+3. 🧮 gom tất cả địa chỉ cần đọc
+4. ⚡ nhóm các địa chỉ liên tiếp để giảm số lần đọc Modbus
+5. 🔄 đọc holding registers và discrete inputs
+6. 🧩 map dữ liệu thô thành payload có nghĩa
+7. 📤 trả JSON cho frontend
+
+Backend hiện có 2 kiểu API:
+
+### API chính theo page
+
+```text
+/api/<page_name>
+```
+
+Ví dụ:
+
+- `GET /api/overview`
+- `GET /api/engine`
+- `GET /api/pid`
+
+### API debug raw Modbus
+
+```text
+/api/debug/modbus-snapshot
+```
+
+API này hữu ích khi bạn muốn:
+
+- kiểm tra PLC có trả dữ liệu không
+- xem giá trị raw trước khi map
+- so sánh xem lỗi nằm ở Modbus hay ở logic mapping
+
+---
+
+## ⚛️ Frontend hoạt động như thế nào
+
+Service gọi API nằm ở:
+
+[`src/services/pidMonitorApi.js`](./src/services/pidMonitorApi.js)
+
+Hiện có:
+
+- `fetchPagePayload(pageName)` cho API chính theo page
+- `fetchDebugModbusSnapshot()` cho API debug
+
+### `Overview.jsx`
+
+[`src/pages/Overview.jsx`](./src/pages/Overview.jsx)
+
+Trang này:
+
+- gọi `/api/overview`
+- lấy `sections.gauges`
+- render bằng `EngineGauge`
+- có `loading`, `error`, `empty state`
+
+### `Engine.jsx`
+
+[`src/pages/Engine.jsx`](./src/pages/Engine.jsx)
+
+Trang này:
+
+- gọi `/api/engine`
+- lấy `sections.bar_chart`
+- lấy `sections.summary`
+- lấy `sections.status`
+- render `EngineBarChart` + summary card
+- có `loading`, `error`, `empty state`
+
+### `PAndID.jsx`
+
+[`src/pages/PAndID.jsx`](./src/pages/PAndID.jsx)
+
+Trang này hiện dùng:
+
+- `/api/pid`
+- `buildPIDMonitorDataFromPagePayload()`
+- `updatePIDMonitorElements()`
+
+để cập nhật text flow và trạng thái digital trong SVG `Monitor items.svg`.
+
+---
+
+## 🚀 Chạy local
 
 ### 1. Cài frontend dependencies
 
@@ -77,211 +248,151 @@ npm install
 pip install -r backend/requirements.txt
 ```
 
-### 3. Cấu hình kết nối Modbus
-
-Mở file:
-
-`backend/pid_monitor_config.json`
-
-Ví dụ:
-
-```json
-{
-  "modbus": {
-    "host": "127.0.0.1",
-    "port": 502,
-    "unit_id": 1,
-    "timeout_seconds": 3,
-    "poll_interval_ms": 2000
-  }
-}
-```
-
-Ý nghĩa:
-
-- `host`: IP thiết bị Modbus TCP / PLC
-- `port`: thường là `502`
-- `unit_id`: slave id / unit id của thiết bị
-- `timeout_seconds`: thời gian timeout mỗi lần đọc
-- `poll_interval_ms`: chu kỳ polling dữ liệu
-
-### 4. Chạy backend
+### 3. Chạy backend
 
 ```bash
 python backend/app.py
 ```
 
-Backend sẽ mở API tại:
+Backend chạy mặc định ở:
 
 ```text
-http://127.0.0.1:8001/api/pid-monitor
+http://127.0.0.1:8001
 ```
 
-### 5. Chạy frontend
+Ví dụ test nhanh:
+
+```text
+http://127.0.0.1:8001/api/overview
+http://127.0.0.1:8001/api/engine
+http://127.0.0.1:8001/api/pid
+http://127.0.0.1:8001/api/debug/modbus-snapshot
+```
+
+### 4. Chạy frontend
 
 ```bash
-npm start
+npm run start
 ```
 
-Frontend Vite sẽ chạy tại địa chỉ như:
+Frontend Vite thường chạy ở:
 
 ```text
 http://localhost:5173
 ```
 
-Vite đã được cấu hình proxy:
+---
 
-- `/api/*` -> `http://127.0.0.1:8001`
+## 🌐 Proxy frontend
 
-## 🔌 Cấu hình mapping Modbus
+Vite đã được cấu hình để frontend có thể gọi `/api/*` qua backend.
 
-Toàn bộ mapping đang nằm trong:
+Ý tưởng là:
 
-- `backend/pid_monitor_config.json`
-- `src/utils/PIDMonitor.js`
-
-### Analog `Flow1 ... Flow18`
-
-Ví dụ:
-
-```json
-{ "id": "Flow1", "register": 40001, "scale": 1, "unit": "L/H" }
+```text
+Frontend -> /api/overview
+Vite proxy -> http://127.0.0.1:8001/api/overview
 ```
 
-Ý nghĩa:
+Nếu có lỗi gọi API, hãy kiểm tra:
 
-- `id`: phải trùng với `id` trong `Monitor items.svg`
-- `register`: địa chỉ holding register kiểu tài liệu Modbus
-- `scale`: hệ số nhân giá trị
-- `unit`: đơn vị hiển thị
+- backend có đang chạy không
+- `vite.config.mjs` có proxy đúng không
+- trình duyệt có báo lỗi network không
 
-Ví dụ nếu PLC trả `1234` nhưng thực tế là `123.4 L/H`, cấu hình:
+---
 
-```json
-{ "id": "Flow1", "register": 40001, "scale": 0.1, "unit": "L/H" }
-```
+## 🛠️ Ví dụ response
 
-### Digital `ON/OFF`
-
-Ví dụ:
-
-```json
-{ "id": "pump 1", "bit": 10001 }
-```
-
-Ý nghĩa:
-
-- `id`: phải trùng với `id` trong SVG
-- `bit`: địa chỉ discrete input / digital point
-
-## 🧠 Lưu ý quan trọng về địa chỉ Modbus
-
-Trong file config, bạn đang dùng notation kiểu tài liệu:
-
-- `40001` cho holding register
-- `10001` cho discrete input
-
-Backend sẽ tự đổi về offset `0-based` khi đọc bằng `pymodbus`:
-
-- `40001` -> offset `0`
-- `40002` -> offset `1`
-- `10001` -> offset `0`
-
-Bạn chỉ cần nhập địa chỉ theo đúng tài liệu PLC/HMI quen dùng.
-
-## 🖥️ Frontend lấy dữ liệu như thế nào
-
-Frontend trong `src/pages/PAndID.jsx` sẽ:
-
-1. gọi API `/api/pid-monitor`
-2. nhận dữ liệu thật từ backend
-3. dùng `src/utils/PIDMonitor.js` để map dữ liệu vào các `id` trong `Monitor items.svg`
-4. đổi:
-   - text của `Flow1 ... Flow18`
-   - màu fill/stroke của các tín hiệu digital
-
-## 🧪 API trả về gì
-
-Ví dụ response:
+### `/api/overview`
 
 ```json
 {
-  "holdingRegisters": {
-    "40001": 100,
-    "40002": 85
-  },
-  "discreteInputs": {
-    "10001": 1,
-    "10002": 0
-  },
-  "meta": {
-    "host": "127.0.0.1",
-    "port": 502,
-    "unitId": 1,
-    "pollIntervalMs": 2000
+  "page": "overview",
+  "sections": {
+    "gauges": [
+      {
+        "key": "engine_1_load",
+        "title": "Engine 1",
+        "subtitle": "Main propulsion load",
+        "unit": "%",
+        "color": "#22c55e",
+        "value": 72
+      }
+    ]
   }
 }
 ```
 
-## 🛠️ Build frontend
+### `/api/pid`
 
-```bash
-npm run build
+```json
+{
+  "page": "pid",
+  "sections": {
+    "flows": [
+      {
+        "key": "flow_1",
+        "name": "Flow 1",
+        "unit": "L/H",
+        "value": 100
+      }
+    ],
+    "digitals": [
+      {
+        "key": "pump_1",
+        "label": "Pump 1",
+        "value": true
+      }
+    ]
+  }
+}
 ```
 
-Output build sẽ nằm trong thư mục:
+### `/api/debug/modbus-snapshot`
 
-```text
-build/
+```json
+{
+  "holdingRegisters": {
+    "40001": 72,
+    "40002": 64
+  },
+  "discreteInputs": {
+    "10001": 1
+  }
+}
 ```
 
-## 🌍 Triển khai dự án
+---
 
-### Phương án 1: Chạy nội bộ trong mạng nhà máy / tàu / xưởng
+## 🧪 Mẫu mở rộng page mới
 
-Phù hợp nhất cho bài toán P&ID realtime.
+Nếu bạn muốn thêm page mới, ví dụ `power`, flow nên là:
 
-Triển khai:
+1. 🗂️ thêm `pages.power` trong `backend_config.json`
+2. ⚛️ tạo `Power.jsx`
+3. 🔌 trong page gọi:
 
-1. 🐍 chạy Flask backend trên máy có thể truy cập thiết bị Modbus
-2. ⚡ build frontend bằng `npm run build`
-3. 🌐 phục vụ thư mục `build/` bằng Nginx, Apache hoặc chính Flask
-4. 🔁 cấu hình reverse proxy để frontend gọi được `/api/pid-monitor`
+```js
+fetchPagePayload("power");
+```
 
-### Phương án 2: Chạy tách frontend và backend
+4. 🎨 render dữ liệu vào component phù hợp
 
-- frontend: web server tĩnh
-- backend: Python service riêng
+Bạn không cần viết API route riêng nếu vẫn dùng pattern `/api/<page_name>`.
 
-Bạn chỉ cần đảm bảo:
+---
 
-- frontend truy cập được backend
-- CORS hoặc reverse proxy được cấu hình đúng
-- máy chạy backend nhìn thấy PLC/Modbus device
+## 📌 Gợi ý cải tiến tiếp theo
 
-### Phương án 3: Đóng gói service backend để chạy lâu dài
+- 🔁 thêm polling tự động theo `poll_interval_ms`
+- 🧱 thêm cache backend để tránh đọc Modbus quá nhiều
+- ❤️ thêm `/api/health`
+- 📝 thêm logging lỗi Modbus
+- 🧪 thêm test cho logic mapping
+- 📊 thêm các page mới như `power`, `alarms`, `exhaust`
 
-Khuyến nghị:
-
-- Windows: chạy backend như scheduled task / NSSM service
-- Linux: chạy bằng `systemd`
-- Docker: nếu môi trường cho phép
-
-## 📌 Gợi ý triển khai production
-
-- 🔒 tắt `debug=True` trong `backend/app.py`
-- 🧱 đặt backend sau Nginx hoặc reverse proxy
-- 📜 thêm logging cho lỗi kết nối Modbus
-- ♻️ thêm retry / reconnect logic nếu thiết bị mất kết nối
-- ⏱️ cân nhắc polling interval phù hợp để không làm nặng PLC
-
-## ⚠️ Những việc nên làm tiếp
-
-- bổ sung `.env` hoặc config production riêng
-- thêm endpoint health check như `/api/health`
-- thêm trạng thái lỗi kết nối trực quan ở frontend
-- thêm bảng chẩn đoán địa chỉ Modbus đang đọc
-- thêm test cho logic mapping trong `PIDMonitor.js`
+---
 
 ## 🐞 Troubleshooting
 
@@ -290,18 +401,27 @@ Khuyến nghị:
 Kiểm tra:
 
 - backend đã chạy chưa
-- `http://127.0.0.1:8001/api/pid-monitor` có trả JSON không
-- Vite proxy có đang hoạt động không
+- `/api/overview`, `/api/engine`, `/api/pid` có trả JSON không
+- Vite proxy có hoạt động không
+- console trình duyệt có báo lỗi không
 
-### Backend báo không kết nối được Modbus
+### Backend không kết nối được Modbus
 
 Kiểm tra:
 
-- IP `host`
+- `host`
 - `port`
 - `unit_id`
 - firewall
 - thiết bị có bật Modbus TCP không
+
+### `PAndID` không cập nhật SVG
+
+Kiểm tra:
+
+- `/api/pid` có trả dữ liệu không
+- `Monitor items.svg` có đúng `id` không
+- `PIDMonitor.js` có đang map đúng trường không
 
 ### Python không chạy được
 
@@ -315,6 +435,14 @@ Sau đó kiểm tra lại:
 python --version
 ```
 
+---
+
 ## 📄 Ghi chú
 
-Dự án hiện đã bỏ mock trong `PAndID.jsx` và chuyển sang đọc dữ liệu thật qua backend Modbus. Nếu cần chế độ demo/offline, có thể bổ sung lại mock mode riêng trong tương lai.
+README này hiện đã khớp với code hiện tại:
+
+- ✅ API chính theo page
+- ✅ `Overview`, `Engine`, `PAndID` đều dùng page-based API
+- ✅ endpoint debug raw riêng vẫn được giữ lại
+- ✅ config nhóm theo page
+- ✅ frontend gọi API qua service chung

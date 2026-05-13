@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Overview from "./pages/Overview";
 import PAndID from "./pages/PAndID";
+import Engine from "./pages/Engine";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
 function App() {
@@ -27,31 +28,31 @@ function App() {
     switch (pathname) {
       case "/":
         title = "Overview | P&ID";
-        metaDescription = "Tổng quan hệ thống P&ID.";
+        metaDescription = "System overview page.";
         break;
       case "/pid":
         title = "P&ID";
-        metaDescription = "Màn hình sơ đồ P&ID của hệ thống.";
+        metaDescription = "P&ID diagram screen.";
         break;
       case "/engine":
         title = "Engine";
-        metaDescription = "Thông tin động cơ.";
+        metaDescription = "Engine monitoring page.";
         break;
       case "/power":
         title = "Power";
-        metaDescription = "Thông tin nguồn điện.";
+        metaDescription = "Power information page.";
         break;
       case "/exhaust":
         title = "Exhaust";
-        metaDescription = "Thông tin hệ thống thoát khí.";
+        metaDescription = "Exhaust system information page.";
         break;
       case "/alarms":
         title = "Alarms";
-        metaDescription = "Cảnh báo hệ thống.";
+        metaDescription = "System alarms page.";
         break;
       default:
         title = "Overview | P&ID";
-        metaDescription = "Tổng quan hệ thống P&ID.";
+        metaDescription = "System overview page.";
     }
 
     if (title) {
@@ -72,21 +73,13 @@ function App() {
     <Routes>
       <Route path="/" element={<Overview />} />
       <Route path="/pid" element={<PAndID />} />
-      <Route
-        path="/engine"
-        element={
-          <PlaceholderPage
-            title="Engine"
-            subtitle="Thông tin động cơ sẽ được hiển thị tại đây."
-          />
-        }
-      />
+      <Route path="/engine" element={<Engine />} />
       <Route
         path="/power"
         element={
           <PlaceholderPage
             title="Power"
-            subtitle="Thông tin nguồn điện sẽ được hiển thị tại đây."
+            subtitle="Power information will be displayed here."
           />
         }
       />
@@ -95,7 +88,7 @@ function App() {
         element={
           <PlaceholderPage
             title="Exhaust"
-            subtitle="Thông tin hệ thống thoát khí sẽ được hiển thị tại đây."
+            subtitle="Exhaust system information will be displayed here."
           />
         }
       />
@@ -104,11 +97,12 @@ function App() {
         element={
           <PlaceholderPage
             title="Alarms"
-            subtitle="Cảnh báo và trạng thái hệ thống sẽ được hiển thị tại đây."
+            subtitle="System alarms and status will be displayed here."
           />
         }
       />
     </Routes>
   );
 }
+
 export default App;

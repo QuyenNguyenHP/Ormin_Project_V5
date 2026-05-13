@@ -9,40 +9,58 @@ from flask_cors import CORS
 from pymodbus.client import ModbusTcpClient
 
 
+# File system and Modbus address family constants.
 BASE_DIR = Path(__file__).resolve().parent
-CONFIG_PATH = BASE_DIR / "pid_monitor_config.json"
+CONFIG_PATH = BASE_DIR / "backend_config.json"
+HOLDING_REGISTER_START = 40001
+DISCRETE_INPUT_START = 10001
 
 
 def load_config() -> dict[str, Any]:
+    """Load the backend configuration once at startup."""
     with CONFIG_PATH.open("r", encoding="utf-8") as config_file:
         return json.load(config_file)
 
 
 CONFIG = load_config()
 MODBUS_CONFIG = CONFIG["modbus"]
-FLOW_MAPPINGS = CONFIG["flows"]
-DIGITAL_MAPPINGS = CONFIG["digitals"]
+PAGE_CONFIGS = CONFIG["pages"]
 
 app = Flask(__name__)
 CORS(app)
 
 
+def build_meta() -> dict[str, Any]:
+    """Return shared metadata included in every API response."""
+    return {
+        "host": MODBUS_CONFIG["host"],
+        "port": MODBUS_CONFIG["port"],
+        "unitId": MODBUS_CONFIG["unit_id"],
+        "pollIntervalMs": MODBUS_CONFIG["poll_interval_ms"],
+    }
+
+
 def modbus_address_to_offset(address: int, family_start: int) -> int:
+    """Convert a human-readable Modbus address into the zero-based pymodbus offset."""
     return address - family_start
 
 
-def group_contiguous_addresses(
-    mappings: list[dict[str, Any]], key: str
-) -> list[tuple[int, int]]:
-    addresses = sorted({int(mapping[key]) for mapping in mappings})
-    if not addresses:
-      return []
+def group_contiguous_addresses(addresses: list[int]) -> list[tuple[int, int]]:
+    """
+    Group adjacent addresses so the backend can read them in larger batches.
+
+    Example:
+    [40001, 40002, 40003, 40010] -> [(40001, 40003), (40010, 40010)]
+    """
+    unique_addresses = sorted(set(addresses))
+    if not unique_addresses:
+        return []
 
     groups: list[tuple[int, int]] = []
-    group_start = addresses[0]
-    group_end = addresses[0]
+    group_start = unique_addresses[0]
+    group_end = unique_addresses[0]
 
-    for address in addresses[1:]:
+    for address in unique_addresses[1:]:
         if address == group_end + 1:
             group_end = address
             continue
@@ -55,13 +73,48 @@ def group_contiguous_addresses(
     return groups
 
 
-def read_holding_register_map(client: ModbusTcpClient) -> dict[int, int]:
-    register_map: dict[int, int] = {}
+def flatten_page_mappings(page_config: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten all section mappings from a page config into one list."""
+    mappings: list[dict[str, Any]] = []
+    for section_items in page_config.values():
+        mappings.extend(section_items)
+    return mappings
 
-    for group_start, group_end in group_contiguous_addresses(FLOW_MAPPINGS, "register"):
+
+def filter_mappings_by_source_type(
+    mappings: list[dict[str, Any]], source_type: str
+) -> list[dict[str, Any]]:
+    """Return only mappings that belong to one Modbus source family."""
+    return [mapping for mapping in mappings if mapping["source_type"] == source_type]
+
+
+def open_modbus_client() -> ModbusTcpClient:
+    """Create and connect a Modbus client using the configured connection settings."""
+    client = ModbusTcpClient(
+        host=MODBUS_CONFIG["host"],
+        port=MODBUS_CONFIG["port"],
+        timeout=MODBUS_CONFIG["timeout_seconds"],
+    )
+
+    if not client.connect():
+        raise ConnectionError(
+            f"Unable to connect to Modbus server {MODBUS_CONFIG['host']}:{MODBUS_CONFIG['port']}"
+        )
+
+    return client
+
+
+def read_holding_register_map(
+    client: ModbusTcpClient, mappings: list[dict[str, Any]]
+) -> dict[int, int]:
+    """Read all holding registers needed by the current payload."""
+    register_map: dict[int, int] = {}
+    addresses = [int(mapping["address"]) for mapping in mappings]
+
+    for group_start, group_end in group_contiguous_addresses(addresses):
         count = group_end - group_start + 1
         response = client.read_holding_registers(
-            address=modbus_address_to_offset(group_start, 40001),
+            address=modbus_address_to_offset(group_start, HOLDING_REGISTER_START),
             count=count,
             slave=MODBUS_CONFIG["unit_id"],
         )
@@ -74,13 +127,17 @@ def read_holding_register_map(client: ModbusTcpClient) -> dict[int, int]:
     return register_map
 
 
-def read_discrete_input_map(client: ModbusTcpClient) -> dict[int, int]:
+def read_discrete_input_map(
+    client: ModbusTcpClient, mappings: list[dict[str, Any]]
+) -> dict[int, int]:
+    """Read all discrete inputs needed by the current payload."""
     bit_map: dict[int, int] = {}
+    addresses = [int(mapping["address"]) for mapping in mappings]
 
-    for group_start, group_end in group_contiguous_addresses(DIGITAL_MAPPINGS, "bit"):
+    for group_start, group_end in group_contiguous_addresses(addresses):
         count = group_end - group_start + 1
         response = client.read_discrete_inputs(
-            address=modbus_address_to_offset(group_start, 10001),
+            address=modbus_address_to_offset(group_start, DISCRETE_INPUT_START),
             count=count,
             slave=MODBUS_CONFIG["unit_id"],
         )
@@ -93,40 +150,157 @@ def read_discrete_input_map(client: ModbusTcpClient) -> dict[int, int]:
     return bit_map
 
 
-def read_pid_monitor_payload() -> dict[str, Any]:
-    client = ModbusTcpClient(
-        host=MODBUS_CONFIG["host"],
-        port=MODBUS_CONFIG["port"],
-        timeout=MODBUS_CONFIG["timeout_seconds"],
-    )
+def read_modbus_maps(mappings: list[dict[str, Any]]) -> tuple[dict[int, int], dict[int, int]]:
+    """
+    Read all Modbus data required by a set of mappings.
 
-    if not client.connect():
-        raise ConnectionError(
-            f"Unable to connect to Modbus server {MODBUS_CONFIG['host']}:{MODBUS_CONFIG['port']}"
-        )
+    The result is split into:
+    - holding register values
+    - discrete input values
+    """
+    holding_mappings = filter_mappings_by_source_type(mappings, "holding_register")
+    discrete_mappings = filter_mappings_by_source_type(mappings, "discrete_input")
 
+    client = open_modbus_client()
     try:
-        holding_registers = read_holding_register_map(client)
-        discrete_inputs = read_discrete_input_map(client)
+        holding_registers = read_holding_register_map(client, holding_mappings)
+        discrete_inputs = read_discrete_input_map(client, discrete_mappings)
     finally:
         client.close()
+
+    return holding_registers, discrete_inputs
+
+
+def transform_mapping_value(
+    mapping: dict[str, Any],
+    holding_registers: dict[int, int],
+    discrete_inputs: dict[int, int],
+) -> Any:
+    """Convert one raw Modbus value into the UI-friendly value declared in config."""
+    address = int(mapping["address"])
+    source_type = mapping["source_type"]
+
+    if source_type == "holding_register":
+        raw_value = holding_registers[address]
+        scale = mapping.get("scale", 1)
+        value = raw_value * scale
+        return int(value) if isinstance(value, float) and value.is_integer() else value
+
+    if source_type == "discrete_input":
+        return bool(discrete_inputs[address])
+
+    raise ValueError(f"Unsupported source_type: {source_type}")
+
+
+def build_section_payload(
+    section_mappings: list[dict[str, Any]],
+    holding_registers: dict[int, int],
+    discrete_inputs: dict[int, int],
+) -> list[dict[str, Any]]:
+    """
+    Build one response section, preserving config metadata and adding the live value.
+
+    Example output item:
+    {
+      "key": "engine_1_load",
+      "title": "Engine 1",
+      "unit": "%",
+      "value": 72
+    }
+    """
+    section_payload: list[dict[str, Any]] = []
+
+    for mapping in section_mappings:
+        payload_item = {
+            key: value
+            for key, value in mapping.items()
+            if key not in {"address", "source_type", "scale"}
+        }
+        payload_item["value"] = transform_mapping_value(
+            mapping, holding_registers, discrete_inputs
+        )
+        section_payload.append(payload_item)
+
+    return section_payload
+
+
+def get_page_config(page_name: str) -> dict[str, Any]:
+    """Fetch one page config and raise a readable error if it does not exist."""
+    page_config = PAGE_CONFIGS.get(page_name)
+    if page_config is None:
+        raise KeyError(f"Unknown page configuration: {page_name}")
+    return page_config
+
+
+def build_page_payload(page_name: str) -> dict[str, Any]:
+    """
+    Build the frontend payload for one page.
+
+    This is the main API path used by page-based frontend screens such as:
+    - /api/overview
+    - /api/engine
+    """
+    page_config = get_page_config(page_name)
+    page_mappings = flatten_page_mappings(page_config)
+    holding_registers, discrete_inputs = read_modbus_maps(page_mappings)
+
+    sections = {
+        section_name: build_section_payload(
+            section_mappings, holding_registers, discrete_inputs
+        )
+        for section_name, section_mappings in page_config.items()
+    }
+
+    return {
+        "page": page_name,
+        "sections": sections,
+        "meta": build_meta(),
+    }
+
+
+def collect_all_page_mappings() -> list[dict[str, Any]]:
+    """Flatten mappings from every configured page for debug inspection."""
+    all_mappings: list[dict[str, Any]] = []
+    for page_config in PAGE_CONFIGS.values():
+        all_mappings.extend(flatten_page_mappings(page_config))
+    return all_mappings
+
+
+def build_debug_modbus_snapshot() -> dict[str, Any]:
+    """
+    Build a raw Modbus snapshot for debugging.
+
+    This endpoint is useful when you want to verify:
+    - which raw addresses are being read
+    - whether the PLC/Modbus server is responding
+    - whether page-level mapping errors come from raw data or mapping logic
+    """
+    all_mappings = collect_all_page_mappings()
+    holding_registers, discrete_inputs = read_modbus_maps(all_mappings)
 
     return {
         "holdingRegisters": holding_registers,
         "discreteInputs": discrete_inputs,
-        "meta": {
-            "host": MODBUS_CONFIG["host"],
-            "port": MODBUS_CONFIG["port"],
-            "unitId": MODBUS_CONFIG["unit_id"],
-            "pollIntervalMs": MODBUS_CONFIG["poll_interval_ms"],
-        },
+        "meta": build_meta(),
     }
 
 
-@app.get("/api/pid-monitor")
-def get_pid_monitor() -> Any:
+@app.get("/api/<page_name>")
+def get_page_payload_route(page_name: str) -> Any:
+    """Serve one frontend page payload using the page name as the API key."""
     try:
-        return jsonify(read_pid_monitor_payload())
+        return jsonify(build_page_payload(page_name))
+    except KeyError as exc:
+        return jsonify({"error": str(exc)}), 404
+    except Exception as exc:  # pragma: no cover - runtime error surface
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.get("/api/debug/modbus-snapshot")
+def get_debug_modbus_snapshot_route() -> Any:
+    """Serve a raw Modbus snapshot for debugging and integration checks."""
+    try:
+        return jsonify(build_debug_modbus_snapshot())
     except Exception as exc:  # pragma: no cover - runtime error surface
         return jsonify({"error": str(exc)}), 500
 
