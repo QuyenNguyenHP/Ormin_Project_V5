@@ -170,7 +170,7 @@ const NavigationSidebar = ({ className = "" }) => {
               <img
                 className="h-5 w-5 relative"
                 alt=""
-                src="/Icon.svg"
+                src="/alarm.png"
                 style={{
                   filter: isActive
                     ? "brightness(0) invert(1)"
