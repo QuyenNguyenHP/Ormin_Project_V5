@@ -13,10 +13,11 @@ const Engine = () => {
   }));
   const summaryItems = payload?.sections?.summary ?? [];
   const statusItems = payload?.sections?.status ?? [];
+  const modbusConnected = error ? false : payload ? true : null;
 
   return (
     <Box className="h-[1080px] relative bg-[#101828] w-full overflow-hidden shrink-0 flex flex-col items-start leading-[normal] tracking-[normal] mq925:h-auto">
-      <Header />
+      <Header modbusConnected={modbusConnected} />
       <main className="self-stretch h-[955px] overflow-hidden shrink-0 flex items-start [row-gap:20px] max-w-full mq1825:flex-wrap">
         <NavigationSidebar />
         <section className="h-[948px] w-[1696px] overflow-hidden shrink-0 flex items-start !p-4 box-border gap-4 max-w-full text-left text-[#f8fafc] font-[Roboto] mq925:h-auto">

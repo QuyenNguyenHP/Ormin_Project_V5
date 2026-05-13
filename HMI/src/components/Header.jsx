@@ -10,7 +10,7 @@ const Header = ({ className = "", modbusConnected = null }) => {
       ? "CHECKING"
       : modbusConnected
       ? "SUCCESSFUL"
-      : "FAIL";
+      : "FAILED";
 
   const modbusStatusColor =
     modbusConnected === null

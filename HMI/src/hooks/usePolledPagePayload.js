@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchPagePayload } from "../services/pidMonitorApi";
 
 const DEFAULT_POLL_INTERVAL_MS = 2000;
@@ -10,54 +10,59 @@ export const usePolledPagePayload = (pageName) => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [pollIntervalMs, setPollIntervalMs] = useState(DEFAULT_POLL_INTERVAL_MS);
 
-  const loadPagePayload = useEffectEvent(async () => {
-    try {
-      const nextPayload = await fetchPagePayload(pageName);
-      setPayload(nextPayload);
-      setLastUpdated(new Date());
-      setPollIntervalMs(nextPayload?.meta?.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS);
-      setError("");
-      return nextPayload;
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : `Failed to load ${pageName} data.`);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  });
-
   useEffect(() => {
     let isActive = true;
-    let timeoutId;
+    let timeoutId = null;
 
     const poll = async () => {
       if (!isActive) {
         return;
       }
 
-      const nextPayload = await loadPagePayload();
+      try {
+        const nextPayload = await fetchPagePayload(pageName);
 
-      if (!isActive) {
-        return;
+        if (!isActive) {
+          return;
+        }
+
+        setPayload(nextPayload);
+        setLastUpdated(new Date());
+        setPollIntervalMs(nextPayload?.meta?.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS);
+        setError("");
+        setIsLoading(false);
+
+        timeoutId = window.setTimeout(
+          poll,
+          nextPayload?.meta?.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS
+        );
+      } catch (loadError) {
+        if (!isActive) {
+          return;
+        }
+
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : `Failed to load ${pageName} data.`
+        );
+        setIsLoading(false);
+
+        timeoutId = window.setTimeout(poll, DEFAULT_POLL_INTERVAL_MS);
       }
-
-      const pollIntervalMs = nextPayload?.meta?.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
-
-      timeoutId = window.setTimeout(poll, pollIntervalMs);
     };
 
     setIsLoading(true);
-    setPayload(null);
     setError("");
     poll();
 
     return () => {
       isActive = false;
-      if (timeoutId) {
+      if (timeoutId !== null) {
         window.clearTimeout(timeoutId);
       }
     };
-  }, [loadPagePayload, pageName]);
+  }, [pageName]);
 
   return {
     payload,

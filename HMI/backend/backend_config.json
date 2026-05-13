@@ -9,25 +9,26 @@
   "pages": {
     "overview": {
       "gauges": [
-        { "key": "engine_1_load", "title": "Engine 1", "subtitle": "Main propulsion load", "source_type": "holding_register", "address": 40001, "scale": 1, "unit": "%", "color": "#22c55e" },
-        { "key": "engine_2_load", "title": "Engine 2", "subtitle": "Auxiliary engine load", "source_type": "holding_register", "address": 40002, "scale": 1, "unit": "%", "color": "#f59e0b" },
-        { "key": "engine_3_load", "title": "Engine 3", "subtitle": "Generator engine load", "source_type": "holding_register", "address": 40003, "scale": 1, "unit": "%", "color": "#38bdf8" }
+        { "key": "engine_1_load", "title": "Engine 1", "subtitle": "Main propulsion load", "source_type": "holding_register", "address": 40019, "scale": 1, "unit": "kW", "color": "#22c55e" },
+        { "key": "engine_2_load", "title": "Engine 2", "subtitle": "Auxiliary engine load", "source_type": "holding_register", "address": 40020, "scale": 1, "unit": "kW", "color": "#f59e0b" },
+        { "key": "engine_3_load", "title": "Engine 3", "subtitle": "Generator engine load", "source_type": "holding_register", "address": 40021, "scale": 1, "unit": "kW", "color": "#38bdf8" },
+        { "key": "engine_4_load", "title": "Engine 4", "subtitle": "Backup engine load", "source_type": "holding_register", "address": 40022, "scale": 1, "unit": "kW", "color": "#ef4444" }
       ]
     },
     "engine": {
       "bar_chart": [
-        { "key": "cyl_1_load", "name": "Cyl 1", "source_type": "holding_register", "address": 40004, "scale": 1, "unit": "%" },
-        { "key": "cyl_2_load", "name": "Cyl 2", "source_type": "holding_register", "address": 40005, "scale": 1, "unit": "%" },
-        { "key": "cyl_3_load", "name": "Cyl 3", "source_type": "holding_register", "address": 40006, "scale": 1, "unit": "%" },
-        { "key": "cyl_4_load", "name": "Cyl 4", "source_type": "holding_register", "address": 40007, "scale": 1, "unit": "%" },
-        { "key": "cyl_5_load", "name": "Cyl 5", "source_type": "holding_register", "address": 40008, "scale": 1, "unit": "%" },
-        { "key": "cyl_6_load", "name": "Cyl 6", "source_type": "holding_register", "address": 40009, "scale": 1, "unit": "%" }
+        { "key": "cyl_1_load", "name": "Cyl 1", "source_type": "holding_register", "address": 40023, "scale": 1, "unit": "oC" },
+        { "key": "cyl_2_load", "name": "Cyl 2", "source_type": "holding_register", "address": 40024, "scale": 1, "unit": "oC" },
+        { "key": "cyl_3_load", "name": "Cyl 3", "source_type": "holding_register", "address": 40025, "scale": 1, "unit": "oC" },
+        { "key": "cyl_4_load", "name": "Cyl 4", "source_type": "holding_register", "address": 40026, "scale": 1, "unit": "oC" },
+        { "key": "cyl_5_load", "name": "Cyl 5", "source_type": "holding_register", "address": 40027, "scale": 1, "unit": "oC" },
+        { "key": "cyl_6_load", "name": "Cyl 6", "source_type": "holding_register", "address": 40028, "scale": 1, "unit": "oC" }
       ],
       "summary": [
-        { "key": "rpm", "label": "RPM", "source_type": "holding_register", "address": 40010, "scale": 1, "unit": "rpm" },
-        { "key": "coolant_temp", "label": "Coolant Temp", "source_type": "holding_register", "address": 40011, "scale": 1, "unit": "C" },
-        { "key": "oil_pressure", "label": "Oil Pressure", "source_type": "holding_register", "address": 40012, "scale": 0.1, "unit": "bar" },
-        { "key": "fuel_rate", "label": "Fuel Rate", "source_type": "holding_register", "address": 40013, "scale": 1, "unit": "L/h" }
+        { "key": "rpm", "label": "RPM", "source_type": "holding_register", "address": 40029, "scale": 1, "unit": "rpm" },
+        { "key": "coolant_temp", "label": "Coolant Temp", "source_type": "holding_register", "address": 40030, "scale": 1, "unit": "C" },
+        { "key": "oil_pressure", "label": "Oil Pressure", "source_type": "holding_register", "address": 40031, "scale": 0.1, "unit": "bar" },
+        { "key": "fuel_rate", "label": "Fuel Rate", "source_type": "holding_register", "address": 40032, "scale": 1, "unit": "L/h" }
       ],
       "status": [
         { "key": "engine_running", "label": "Engine Running", "source_type": "discrete_input", "address": 10001 }
@@ -55,18 +56,18 @@
         { "key": "flow_18", "name": "Flow 18", "source_type": "holding_register", "address": 40018, "scale": 1, "unit": "L/H" }
       ],
       "digitals": [
-        { "key": "pump_1", "label": "Pump 1", "source_type": "discrete_input", "address": 10001 },
-        { "key": "pump_2", "label": "Pump 2", "source_type": "discrete_input", "address": 10002 },
-        { "key": "pump_3", "label": "Pump 3", "source_type": "discrete_input", "address": 10003 },
-        { "key": "pump_4", "label": "Pump 4", "source_type": "discrete_input", "address": 10004 },
-        { "key": "pump_5", "label": "Pump 5", "source_type": "discrete_input", "address": 10005 },
-        { "key": "pump_6", "label": "Pump 6", "source_type": "discrete_input", "address": 10006 },
-        { "key": "pump_7", "label": "Pump 7", "source_type": "discrete_input", "address": 10007 },
-        { "key": "pump_8", "label": "Pump 8", "source_type": "discrete_input", "address": 10008 },
-        { "key": "pump_9", "label": "Pump 9", "source_type": "discrete_input", "address": 10009 },
-        { "key": "pump_10", "label": "Pump 10", "source_type": "discrete_input", "address": 10010 },
-        { "key": "pump_11", "label": "Pump 11", "source_type": "discrete_input", "address": 10011 },
-        { "key": "pump_12", "label": "Pump 12", "source_type": "discrete_input", "address": 10012 },
+        { "key": "pump_1", "label": "pump 1", "source_type": "discrete_input", "address": 10001 },
+        { "key": "pump_2", "label": "pump 2", "source_type": "discrete_input", "address": 10002 },
+        { "key": "pump_3", "label": "pump 3", "source_type": "discrete_input", "address": 10003 },
+        { "key": "pump_4", "label": "pump 4", "source_type": "discrete_input", "address": 10004 },
+        { "key": "pump_5", "label": "pump 5", "source_type": "discrete_input", "address": 10005 },
+        { "key": "pump_6", "label": "pump 6", "source_type": "discrete_input", "address": 10006 },
+        { "key": "pump_7", "label": "pump 7", "source_type": "discrete_input", "address": 10007 },
+        { "key": "pump_8", "label": "pump 8", "source_type": "discrete_input", "address": 10008 },
+        { "key": "pump_9", "label": "pump 9", "source_type": "discrete_input", "address": 10009 },
+        { "key": "pump_10", "label": "pump 10", "source_type": "discrete_input", "address": 10010 },
+        { "key": "pump_11", "label": "pump 11", "source_type": "discrete_input", "address": 10011 },
+        { "key": "pump_12", "label": "pump 12", "source_type": "discrete_input", "address": 10012 },
         { "key": "lc_do_service_tank", "label": "LC_D.O.service.tank", "source_type": "discrete_input", "address": 10013 },
         { "key": "lc_ho_settling_tank", "label": "LC_H.O.settling.tank", "source_type": "discrete_input", "address": 10014 },
         { "key": "lh_do_service_tank", "label": "LH_D.O.service.tank", "source_type": "discrete_input", "address": 10015 },

@@ -27,26 +27,12 @@ const formatPollInterval = (pollIntervalMs) => {
   return `every ${formattedSeconds}s`;
 };
 
-const getNetworkStatusClassName = (networkStatus) => {
-  if (networkStatus === "Connected") {
-    return "text-[#05DF72]";
-  }
-
-  if (networkStatus === "Disconnected") {
-    return "text-[#f87171]";
-  }
-
-  return "text-[#f59e0b]";
-};
-
 const Footer = ({
   className = "",
   lastUpdated = null,
-  networkStatus = "Connected",
   pollIntervalMs = null,
 }) => {
   const pollIntervalLabel = formatPollInterval(pollIntervalMs);
-  const networkStatusClassName = getNetworkStatusClassName(networkStatus);
 
   return (
     <footer
@@ -77,16 +63,6 @@ const Footer = ({
             </div>
           </Box>
         </Box>
-        <Box className="h-4 w-[128.3px] flex items-center gap-2">
-          <img className="h-3 w-3 relative" alt="" src="/Icon.svg" />
-          <Box className="h-4 flex-1 flex items-start">
-            <div
-              className={`relative leading-4 whitespace-nowrap shrink-0 ${networkStatusClassName}`}
-            >
-              Network: {networkStatus}
-            </div>
-          </Box>
-        </Box>
       </Box>
     </footer>
   );
@@ -98,7 +74,6 @@ Footer.propTypes = {
     PropTypes.instanceOf(Date),
     PropTypes.string,
   ]),
-  networkStatus: PropTypes.string,
   pollIntervalMs: PropTypes.number,
 };
 
