@@ -10,6 +10,10 @@ const fallbackInfoCards = [
   { title: "Stations Online", value: "8 / 8" },
   { title: "Current Flow", value: "100 L/H" },
   { title: "System Mode", value: "Normal" },
+  { title: "Network Status", value: "Connected" },
+  { title: "Stations Online", value: "8 / 8" },
+  { title: "Current Flow", value: "100 L/H" },
+  { title: "System Mode", value: "Normal" },
 ];
 
 const Overview = () => {
@@ -24,6 +28,7 @@ const Overview = () => {
         <NavigationSidebar />
         <section className="h-[948px] w-[1696px] overflow-hidden shrink-0 flex items-start justify-center !p-4 box-border gap-4 max-w-full text-left text-[#f8fafc] font-[Roboto] mq925:h-auto">
           <Box className="h-[916px] flex-1 rounded-[10px] bg-[#1e2939] border-[#364153] border-solid border-[1px] box-border overflow-auto flex flex-col items-start !pt-[32px] !pb-[32px] !pl-10 !pr-10 max-w-full shrink-0 mq925:h-auto">
+            
             <Typography
               variant="h2"
               component="h1"
@@ -83,16 +88,15 @@ const Overview = () => {
                 : null}
             </Box>
 
-            <Box className="mt-4 grid grid-cols-4 gap-4 w-full w-full">
-              {fallbackInfoCards.map((card) => (
-                <Box
-                  key={card.title}
-                  className="rounded-[10px] bg-[#111827] border border-[#334155] p-5"
-                >
-                  <Typography className="text-[#fff] font-semibold">{card.title}</Typography>
-                  <Typography className="text-[#94a3b8] mt-2">{card.value}</Typography>
-                </Box>
-              ))}
+           <Box className="mt-4 grid grid-cols-4 gap-4 w-full w-full"> 
+            {fallbackInfoCards.map((card) => ( 
+              <Box 
+              key={card.title} 
+              className="mt-0 grid grid-cols-2 rounded-[10px] bg-[#111827] border border-[#334155] p-5" > 
+              <Typography className="text-[#fff] font-semibold">{card.title}</Typography> 
+              <Typography className="text-[#94a3b8] mt-2">{card.value}</Typography>
+               </Box>
+               ))}
             </Box>
           </Box>
         </section>

@@ -4,8 +4,15 @@ import PropTypes from "prop-types";
 
 const NavigationSidebar = ({ className = "" }) => {
   const navItemClass = ({ isActive }) =>
-    `self-stretch h-11 flex items-center !pt-3 !pb-3 !pl-4 !pr-4 box-border gap-3 text-[#99A1AF] no-underline hover:no-underline ${
+    `group self-stretch h-11 flex items-center !pt-3 !pb-3 !pl-4 !pr-4 box-border gap-3 text-[#99A1AF] no-underline hover:no-underline border border-transparent transition-all duration-300 hover:border-[#64748b] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.35)] hover:bg-[#1e293b] hover:text-[#fff] cursor-pointer ${
       isActive ? "bg-[#155dfc] text-[#fff]" : ""
+    }`;
+
+  const navIconClass = (isActive) =>
+    `h-5 w-5 relative transition-all duration-300 ${
+      isActive
+        ? "brightness-0 invert"
+        : "grayscale brightness-[0.7] group-hover:grayscale-0 group-hover:brightness-0 group-hover:invert"
     }`;
 
   return (
@@ -33,14 +40,9 @@ const NavigationSidebar = ({ className = "" }) => {
           {({ isActive }) => (
             <>
               <img
-                className="h-5 w-5 relative"
+                className={navIconClass(isActive)}
                 alt=""
                 src="/overview.png"
-                style={{
-                  filter: isActive
-                    ? "brightness(0) invert(1)"
-                    : "grayscale(1) brightness(0.7)",
-                }}
               />
               <Box className="h-5 flex-1 flex items-start">
                 <div className="flex-1 relative leading-5 font-medium">Overview</div>
@@ -60,14 +62,9 @@ const NavigationSidebar = ({ className = "" }) => {
           {({ isActive }) => (
             <>
               <img
-                className="h-5 w-5 relative"
+                className={navIconClass(isActive)}
                 alt=""
                 src="/Icon.svg"
-                style={{
-                  filter: isActive
-                    ? "brightness(0) invert(1)"
-                    : "grayscale(1) brightness(0.7)",
-                }}
               />
               <Box className="h-5 flex-1 flex items-start">
                 <div className="flex-1 relative leading-5 font-medium">Engine</div>
@@ -87,14 +84,9 @@ const NavigationSidebar = ({ className = "" }) => {
           {({ isActive }) => (
             <>
               <img
-                className="h-5 w-5 relative"
+                className={navIconClass(isActive)}
                 alt=""
                 src="/Icon.svg"
-                style={{
-                  filter: isActive
-                    ? "brightness(0) invert(1)"
-                    : "grayscale(1) brightness(0.7)",
-                }}
               />
               <Box className="h-5 flex-1 flex items-start">
                 <div className="flex-1 relative leading-5 font-medium">Power</div>
@@ -114,14 +106,9 @@ const NavigationSidebar = ({ className = "" }) => {
           {({ isActive }) => (
             <>
               <img
-                className="h-5 w-5 relative"
+                className={navIconClass(isActive)}
                 alt=""
                 src="/Icon.svg"
-                style={{
-                  filter: isActive
-                    ? "brightness(0) invert(1)"
-                    : "grayscale(1) brightness(0.7)",
-                }}
               />
               <Box className="h-5 flex-1 flex items-start">
                 <div className="flex-1 relative leading-5 font-medium">Exhaust</div>
@@ -141,14 +128,9 @@ const NavigationSidebar = ({ className = "" }) => {
           {({ isActive }) => (
             <>
               <img
-                className="h-5 w-5 relative"
+                className={navIconClass(isActive)}
                 alt=""
                 src="/P&ID.svg"
-                style={{
-                  filter: isActive
-                    ? "brightness(0) invert(1)"
-                    : "grayscale(1) brightness(0.7)",
-                }}
               />
               <Box className="h-5 flex-1 flex items-start">
                 <div className="flex-1 relative leading-5 font-medium">{`P&ID`}</div>
@@ -168,14 +150,9 @@ const NavigationSidebar = ({ className = "" }) => {
           {({ isActive }) => (
             <>
               <img
-                className="h-5 w-5 relative"
+                className={navIconClass(isActive)}
                 alt=""
                 src="/alarm.png"
-                style={{
-                  filter: isActive
-                    ? "brightness(0) invert(1)"
-                    : "grayscale(1) brightness(0.7)",
-                }}
               />
               <Box className="h-5 flex-1 flex items-start">
                 <div className="flex-1 relative leading-5 font-medium">Alarms</div>
